@@ -1,0 +1,21 @@
+<#import "../layout/defaultLayout.ftl.html" as layout> 
+<@layout.myLayout "Home page">    
+
+<#list clients?keys as prop>
+<form action="/send" method="post">
+    <p>${prop}: <a href="/stopClient?clientId=${prop}"> Disconnect </a>
+    <a href="/blink/clientId=${prop}"> Blink </a>
+    <input type="hidden" name="clientId" value="${prop}" />
+    
+    <input type="text" name="command" autofocus />
+    </p>
+    <input type="submit" value="SEND" />        
+    </form>
+</#list>
+
+<form action="/multicast" method="post">    
+    <input type="text" name="command" autofocus />
+  
+    <input type="submit" value="SEND" />        
+   </form>
+</@layout.myLayout>
