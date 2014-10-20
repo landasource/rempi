@@ -21,11 +21,10 @@ import org.jboss.netty.handler.timeout.ReadTimeoutException;
 import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.Timer;
 import org.jboss.netty.util.TimerTask;
-import org.landa.rempi.comm.Authentication;
-import org.landa.rempi.comm.ExecutableCommand;
+import org.landa.rempi.client.executors.Commandor;
+import org.landa.rempi.client.modules.auth.Authenticator;
+import org.landa.rempi.comm.Command;
 import org.landa.rempi.comm.ServerGreeting;
-import org.landa.rempi.comm.impl.BlinkingCommand;
-import org.landa.rempi.comm.impl.TextCommand;
 
 /**
  * Handler implementation for the object echo client. It initiates the ping-pong
@@ -67,6 +66,16 @@ public class RempiClientHandler extends SimpleChannelUpstreamHandler {
         final ChannelFuture channelFuture = sslHandler.handshake();
 
         channelFuture.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+        channelFuture.addListener(new ChannelFutureListener() {
+
+            @Override
+            public void operationComplete(final ChannelFuture future) throws Exception {
+                if (future.isSuccess()) {
+                    Commandor.addExecutor(ServerGreeting.class, new Authenticator(clientId));
+                }
+
+            }
+        });
 
         //super.channelConnected(ctx, e);
     }
@@ -75,39 +84,10 @@ public class RempiClientHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
         final Object message = e.getMessage();
 
-        logger.info("Message: " + message);
-
-        if (message instanceof ServerGreeting) {
-
-            e.getChannel().write(new Authentication(clientId));
-
-        } else if (message instanceof ExecutableCommand) {
-
-            final ExecutableCommand executableCommand = (ExecutableCommand) message;
-            logger.info("Execute command");
-            executableCommand.execute();
-
-        } else if (message instanceof TextCommand) {
-            final String text = ((TextCommand) message).getMessage();
-
-            if ("reconnect".equals(text)) {
-
-                e.getChannel().close();
-
-            } else if ("blink".equals(text)) {
-                new BlinkingCommand().execute();
-            } else if (text.startsWith("play ")) {
-
-                final String url = text.substring("play ".length());
-                logger.info("Play music " + url);
-
-                Runtime.getRuntime().exec("omxplayer " + url);
-
-            }
-
-            logger.info("Command from server: " + text);
+        if (message instanceof Command) {
+            new Commandor().execute((Command) message, e.getChannel());
         } else {
-            logger.info("Message from server: " + message);
+            logger.warning("Unknown message: " + message);
         }
 
         super.messageReceived(ctx, e);

@@ -21,8 +21,9 @@ import ninja.Result;
 import ninja.Results;
 import ninja.params.Param;
 
-import org.landa.rempi.comm.impl.BlinkingCommand;
+import org.landa.rempi.comm.impl.CaptureCommand;
 import org.landa.rempi.server.io.RempiServer;
+import org.landa.rempi.server.io.comm.Promise;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -38,20 +39,29 @@ public class ApplicationController {
         return Results.html().render("clients", rempiServer.getClients());
     }
 
-    public Result send(final Context context) {
+    public Result capture(@Param("clientId") final String clientId) {
 
-        final String clientId = context.getParameter("clientId");
-        final String command = context.getParameter("command");
+        System.out.println("Capture " + clientId);
+        final Promise<Object> syncCommand = rempiServer.sendSyncCommand(clientId, new CaptureCommand());
 
-        rempiServer.sendCommand(clientId, command);
+        syncCommand.waitForComplete();
+        System.out.println("Done");
+        if (syncCommand.isSucceeded()) {
 
-        return Results.redirect("/");
-    }
+            try {
+                final byte[] originalImage = (byte[]) syncCommand.get();
 
-    public Result blink(@Param("clientId") final String clientId) {
-        rempiServer.sendCommand(clientId, new BlinkingCommand());
+                System.out.println("Sync result");
 
-        return Results.redirect("/");
+                return Results.contentType("image/jpeg").renderRaw(originalImage);
+
+            } catch (final Exception exception) {
+                return Results.badRequest();
+            }
+
+        } else {
+            return Results.redirect("/");
+        }
     }
 
     public Result multicast(final Context context) {

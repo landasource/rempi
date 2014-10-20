@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,6 +16,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelState;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.channel.FailedChannelFuture;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.group.ChannelGroup;
@@ -23,7 +25,10 @@ import org.jboss.netty.handler.ssl.SslHandler;
 import org.landa.rempi.comm.Authentication;
 import org.landa.rempi.comm.Command;
 import org.landa.rempi.comm.ServerGreeting;
-import org.landa.rempi.comm.impl.TextCommand;
+import org.landa.rempi.comm.SyncCommand;
+import org.landa.rempi.comm.SyncResult;
+import org.landa.rempi.server.io.comm.Promise;
+import org.landa.rempi.server.io.comm.WaitingPromise;
 
 /**
  * Handles both client-side and server-side handler depending on which
@@ -35,6 +40,11 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
 
     private final ConcurrentMap<String, Integer> clients = new ConcurrentHashMap<>();
     private final ChannelGroup channels = new DefaultChannelGroup("all");
+
+    /**
+     * Key: command id, Value: promise
+     */
+    private final ConcurrentMap<Integer, WaitingPromise> syncPromises = new ConcurrentHashMap<Integer, WaitingPromise>();
 
     @Override
     public void handleUpstream(final ChannelHandlerContext ctx, final ChannelEvent e) throws Exception {
@@ -62,8 +72,29 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
         super.messageReceived(ctx, e);
 
+        final Integer channelId = e.getChannel().getId();
         final Object message = e.getMessage();
-        if (message instanceof Authentication) {
+
+        final WaitingPromise promise = syncPromises.get(channelId);
+        // TODO handle expected
+        if (message instanceof SyncResult) {
+
+            final SyncResult syncResult = (SyncResult) message;
+
+            if (null != promise) {
+
+                if (promise.getExpectedId().equals(syncResult.getId())) {
+                    promise.getPromise().succeed(syncResult.getResult());
+                    syncPromises.remove(syncResult.getId());
+                } else {
+                    logger.info("No expected sync result");
+                    promise.getPromise().fail();
+                }
+            } else {
+                logger.info("No promise waiting for:" + syncResult.getId());
+            }
+
+        } else if (message instanceof Authentication) {
             final Authentication authentication = (Authentication) message;
             final String clientId = authentication.getClientId();
 
@@ -106,7 +137,7 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
 
     public void broadcast(final String command) {
 
-        channels.write(new TextCommand(command));
+        channels.write(command);
     }
 
     /**
@@ -116,15 +147,22 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
         return clients;
     }
 
-    public void send(final String clientId, final Command command) {
+    public ChannelFuture send(final String clientId, final Command command) {
 
         final Channel channel = getChannelByClientId(clientId);
         if (null == channel) {
             logger.severe("Unknown client: " + clientId);
+            throw new IllegalArgumentException("Unknown client:" + clientId);
         } else if (channel.isWritable()) {
+
             logger.info("Send command: " + command);
-            channel.write(command);
+
+            final ChannelFuture future = channel.write(command);
+
+            return future;
         }
+
+        return new FailedChannelFuture(channel, new IllegalArgumentException("Unknown client:" + clientId));
 
     }
 
@@ -181,4 +219,22 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
         }
     }
 
+    public Promise<Object> sendSyncCommand(final String clientId, final SyncCommand command) {
+        final Promise<Object> promise = new Promise<Object>();
+
+        final Channel channel = getChannelByClientId(clientId);
+
+        syncPromises.put(channel.getId(), new WaitingPromise(command.getId(), promise));
+
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+
+            @Override
+            public void run() {
+                System.out.println("Send sync command");
+                send(clientId, command);
+            }
+        });
+
+        return promise;
+    }
 }

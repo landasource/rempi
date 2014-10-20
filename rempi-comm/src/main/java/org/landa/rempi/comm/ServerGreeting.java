@@ -1,12 +1,14 @@
 package org.landa.rempi.comm;
 
-import java.io.Serializable;
-
 /**
  * @author Zsolt Lengyel (zsolt.lengyel.it@gmail.com)
  */
-public class ServerGreeting implements Serializable {
+public class ServerGreeting implements Command {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 7334542256674489733L;
     private String message;
 
     /**

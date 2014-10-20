@@ -27,8 +27,7 @@ public class Routes implements ApplicationRoutes {
     public void init(final Router router) {
 
         router.GET().route("/").with(ApplicationController.class, "index");
-        router.POST().route("/send").with(ApplicationController.class, "send");
-        router.GET().route("/blink").with(ApplicationController.class, "blink");
+        router.GET().route("/capture").with(ApplicationController.class, "capture");
         router.POST().route("/multicast").with(ApplicationController.class, "multicast");
         router.GET().route("/stopClient").with(ApplicationController.class, "stopClient");
 

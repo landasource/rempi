@@ -6,8 +6,9 @@ import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.landa.rempi.comm.ExecutableCommand;
-import org.landa.rempi.comm.impl.TextCommand;
+import org.landa.rempi.comm.Command;
+import org.landa.rempi.comm.SyncCommand;
+import org.landa.rempi.server.io.comm.Promise;
 import org.landa.rempi.server.io.ssh.SecureServerPipelineFactory;
 
 /**
@@ -45,17 +46,17 @@ public class RempiServer {
         return rempiServerHandler.getClients();
     }
 
-    public void sendCommand(final String clientId, final String command) {
-        rempiServerHandler.send(clientId, new TextCommand(command));
-    }
-
-    public void sendCommand(final String clientId, final ExecutableCommand command) {
+    public void sendCommand(final String clientId, final Command command) {
         rempiServerHandler.send(clientId, command);
     }
 
     public void disconnet(final String clientId) {
         rempiServerHandler.disconnetClient(clientId);
+    }
 
+    public Promise<Object> sendSyncCommand(final String clientId, final SyncCommand captureCommand) {
+
+        return rempiServerHandler.sendSyncCommand(clientId, captureCommand);
     }
 
 }
