@@ -53,7 +53,7 @@ public class ApplicationController {
 
                 System.out.println("Sync result");
 
-                return Results.contentType("image/jpeg").renderRaw(originalImage);
+                return Results.contentType("image/jpeg").doNotCacheContent().renderRaw(originalImage);
 
             } catch (final Exception exception) {
                 return Results.badRequest();

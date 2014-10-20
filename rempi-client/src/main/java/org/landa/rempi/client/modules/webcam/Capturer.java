@@ -1,5 +1,6 @@
 package org.landa.rempi.client.modules.webcam;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 
@@ -38,6 +39,7 @@ public class Capturer implements Executor<CaptureCommand> {
             channel.write(new CaptureResponse(command, bytes));
 
         } catch (final Exception exception) {
+            exception.printStackTrace(System.err);
             channel.write(new CaptureResponse(command, null));
         }
     }
@@ -49,6 +51,17 @@ public class Capturer implements Executor<CaptureCommand> {
 
         // get default webcam and open it
         final Webcam webcam = Webcam.getDefault();
+        final Dimension[] viewSizes = webcam.getViewSizes();
+        Dimension maxDimension = viewSizes[0];
+
+        for (final Dimension dimension : viewSizes) {
+            if (dimension.height > maxDimension.height) {
+                maxDimension = dimension;
+            }
+        }
+
+        webcam.setViewSize(maxDimension);
+
         webcam.open();
 
         // get image from webcam device
