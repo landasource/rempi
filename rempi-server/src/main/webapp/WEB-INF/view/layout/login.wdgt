@@ -1,0 +1,13 @@
+import com.landasource.wiidget.library.template.Template;
+import com.landasource.wiidget.library.template.Part;
+import com.landasource.wiidget.library.template.SimplePart;
+
+Template("layout/login.html"){
+
+	SimplePart(name = "contextPath", value = contextPath);
+
+	Part("body"){		
+		`content`;		
+	}
+	
+}

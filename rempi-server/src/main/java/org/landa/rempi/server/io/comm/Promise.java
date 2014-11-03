@@ -29,9 +29,9 @@ public class Promise<T> {
 
     public void waitForComplete() {
         int loppHacker = 0;
-        while (!isCompleted() && ++loppHacker < 10) {
+        while (!isCompleted() && ++loppHacker < 100) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }

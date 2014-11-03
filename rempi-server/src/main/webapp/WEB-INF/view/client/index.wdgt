@@ -1,0 +1,87 @@
+
+import org.landa.rempi.server.web.modules.auth.controllers.LoginController;
+import org.landa.rempi.server.web.controller.ClientController;
+import io.pallas.core.view.wiidget.tool.Link;
+	
+h1(application.name);
+
+/*
+p{
+
+	Link([LoginController]){
+		"Login";
+	}
+
+	Link([LoginController, "logout"]){
+        "Logout";
+    }
+	
+	p{
+	    `"Auth: " + user.isAuthenticated()`;
+	    
+	}
+
+
+}
+*/
+
+div(class = row){
+    
+    div(class="col-md-6"){
+        div(class = "box"){
+            div(class = "header"){
+                h3("Clients");
+            }
+            div(class = "box-body"){
+                
+                table(class="table table-bordered"){
+                    thead{
+                        tr{
+                            th("Client");
+                            th("Connection");
+                            th("Actions");
+                        }
+                    }
+                    tbody(rendered = !clients.isEmpty()){
+                        
+                        // iterate over clients
+                        foreach(clientId -> connId : clients){
+                            
+                            tr{
+                                td(clientId);                                
+                                td(connId);
+                                // actions
+                                td{
+                                    
+                                    button(type="button", class="btn btn-default btn-sm", onclick="capture('" + clientId + "', this)"){ "Capture"; }             
+                                    div(id="capture-" + clientId);
+                                    
+                                }
+                                
+                            }
+                            
+                        }
+                        
+                    }
+                }
+                
+            }
+            
+        }
+    }
+    
+    div(class="col-md-6"){
+        
+    }
+    
+    script(type="text/javascript"){
+        "function capture(clientId, btn){
+            var img = $('<img>').attr('src', '";
+            `link.of(ClientController.type, "capture")`;              
+            "?clientId=' + clientId);
+           $(btn).next('div').html(img);
+        }
+        ";
+    }
+    
+}

@@ -2,7 +2,7 @@ package org.landa.rempi.server.io;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -20,13 +20,15 @@ public class RempiServer {
     private ServerBootstrap bootstrap;
 
     final RempiServerHandler rempiServerHandler = new RempiServerHandler();
+    private final Executor executor;
 
-    public RempiServer(final int port) {
+    public RempiServer(final int port, final Executor executor) {
         this.port = port;
+        this.executor = executor;
     }
 
     public void run() {
-        bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+        bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(executor, executor));
 
         bootstrap.setPipelineFactory(new SecureServerPipelineFactory(rempiServerHandler));
 
