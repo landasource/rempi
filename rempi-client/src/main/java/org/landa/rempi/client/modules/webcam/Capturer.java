@@ -18,9 +18,27 @@ import com.github.sarxos.webcam.ds.fswebcam.FsWebcamDriver;
  * @author Zsolt Lengyel (zsolt.lengyel.it@gmail.com)
  */
 public class Capturer implements Executor<CaptureCommand> {
+
+    static Webcam webcam;
+
     // set capture driver for fswebcam tool
     static {
         Webcam.setDriver(new FsWebcamDriver());
+        webcam = Webcam.getDefault();
+
+        final Dimension[] viewSizes = webcam.getViewSizes();
+        Dimension maxDimension = viewSizes[0];
+
+        for (final Dimension dimension : viewSizes) {
+            if (dimension.height > maxDimension.height) {
+                maxDimension = dimension;
+            }
+        }
+        webcam.setViewSize(maxDimension);
+
+        webcam.open();
+
+        webcam.open();
     }
 
     @Override
@@ -50,25 +68,9 @@ public class Capturer implements Executor<CaptureCommand> {
     public BufferedImage captureImage() {
 
         // get default webcam and open it
-        final Webcam webcam = Webcam.getDefault();
-        final Dimension[] viewSizes = webcam.getViewSizes();
-        Dimension maxDimension = viewSizes[0];
-
-        for (final Dimension dimension : viewSizes) {
-            if (dimension.height > maxDimension.height) {
-                maxDimension = dimension;
-            }
-        }
-
-        webcam.setViewSize(maxDimension);
-
-        webcam.open();
 
         // get image from webcam device
         final BufferedImage image = webcam.getImage();
-
-        // close webcam
-        webcam.close();
 
         return image;
     }

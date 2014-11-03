@@ -31,7 +31,7 @@ public class Promise<T> {
         int loppHacker = 0;
         while (!isCompleted() && ++loppHacker < 100) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(50);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }

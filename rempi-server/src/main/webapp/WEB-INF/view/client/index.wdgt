@@ -53,7 +53,7 @@ div(class = row){
                                 // actions
                                 td{
                                     
-                                    button(type="button", class="btn btn-default btn-sm", onclick="capture('" + clientId + "', this)"){ "Capture"; }             
+                                    button(type="button", class="btn btn-default btn-sm capture-button", "data-clientId"= clientId, onclick="capture('" + clientId + "', this)"){ "Capture"; }             
                                     div(id="capture-" + clientId);
                                     
                                 }
@@ -74,14 +74,5 @@ div(class = row){
         
     }
     
-    script(type="text/javascript"){
-        "function capture(clientId, btn){
-            var img = $('<img>').attr('src', '";
-            `link.of(ClientController.type, "capture")`;              
-            "?clientId=' + clientId);
-           $(btn).next('div').html(img);
-        }
-        ";
-    }
     
 }
