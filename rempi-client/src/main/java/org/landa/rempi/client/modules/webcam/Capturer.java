@@ -37,8 +37,6 @@ public class Capturer implements Executor<CaptureCommand> {
         webcam.setViewSize(maxDimension);
 
         webcam.open();
-
-        webcam.open();
     }
 
     @Override

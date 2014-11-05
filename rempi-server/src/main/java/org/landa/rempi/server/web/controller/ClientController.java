@@ -22,9 +22,13 @@ import io.pallas.core.execution.InternalServerErrorException;
 import io.pallas.core.execution.Redirect;
 import io.pallas.core.execution.Response;
 import io.pallas.core.view.View;
+import io.pallas.core.ws.events.OpenEvent;
+import io.pallas.core.ws.events.WebSocket;
 
 import java.io.IOException;
 
+import javax.enterprise.event.Observes;
+import javax.enterprise.event.Reception;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
@@ -43,6 +47,16 @@ public class ClientController extends BaseController {
     public View index() {
 
         return view().set("clients", rempiServer.getClients());
+    }
+
+    public void onWsConnection(@Observes(notifyObserver = Reception.ALWAYS) @WebSocket(path = "/rempi-server") final OpenEvent event) {
+
+        event.getChannel().write("Hello");
+    }
+
+    public void onWsConnection1(@Observes @WebSocket(path = "/rempi-server/ser") final OpenEvent event) {
+
+        event.getChannel().write("Hello 1");
     }
 
     public io.pallas.core.execution.Result capture(@QueryParam("clientId") final String clientId) {
