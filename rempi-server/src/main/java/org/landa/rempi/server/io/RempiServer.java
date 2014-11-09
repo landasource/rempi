@@ -19,12 +19,13 @@ public class RempiServer {
     private final int port;
     private ServerBootstrap bootstrap;
 
-    final RempiServerHandler rempiServerHandler = new RempiServerHandler();
+    private final RempiServerHandler rempiServerHandler;
     private final Executor executor;
 
-    public RempiServer(final int port, final Executor executor) {
+    public RempiServer(final int port, final Executor executor, final RempiServerHandler handler) {
         this.port = port;
         this.executor = executor;
+        rempiServerHandler = handler;
     }
 
     public void run() {

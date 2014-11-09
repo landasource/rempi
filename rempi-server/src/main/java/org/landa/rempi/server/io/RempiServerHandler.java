@@ -8,6 +8,9 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
+
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelFuture;
@@ -29,6 +32,8 @@ import org.landa.rempi.comm.SyncCommand;
 import org.landa.rempi.comm.SyncResult;
 import org.landa.rempi.server.io.comm.Promise;
 import org.landa.rempi.server.io.comm.WaitingPromise;
+import org.landa.rempi.server.io.event.OnClientConnected;
+import org.landa.rempi.server.io.event.OnClientDisconnected;
 
 /**
  * Handles both client-side and server-side handler depending on which
@@ -40,6 +45,9 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
 
     private final ConcurrentMap<String, Integer> clients = new ConcurrentHashMap<>();
     private final ChannelGroup channels = new DefaultChannelGroup("all");
+
+    @Inject
+    private BeanManager beanManager;
 
     /**
      * Key: command id, Value: promise
@@ -103,6 +111,10 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
 
             logger.info("Client authenticated: " + clientId);
 
+            // fire event
+            final OnClientConnected connected = new OnClientConnected(clientId);
+            beanManager.fireEvent(connected);
+
         } else {
             logger.info("Message from client: " + message.toString());
         }
@@ -122,6 +134,7 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
 
         if (null != clientId) {
             clients.remove(clientId);
+            beanManager.fireEvent(new OnClientDisconnected(clientId));
         }
         channels.remove(e.getChannel());
 
@@ -136,7 +149,6 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
     }
 
     public void broadcast(final String command) {
-
         channels.write(command);
     }
 
@@ -188,7 +200,7 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
         return null;
     }
 
-    private static final class Greeter implements ChannelFutureListener {
+    private class Greeter implements ChannelFutureListener {
 
         private final SslHandler sslHandler;
         private final ChannelGroup channelGroup;

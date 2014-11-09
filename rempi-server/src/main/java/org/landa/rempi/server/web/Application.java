@@ -9,7 +9,7 @@ import javax.enterprise.inject.Specializes;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
-import org.landa.rempi.server.web.controller.ClientController;
+import org.landa.rempi.server.web.controller.client.ClientController;
 
 /**
  * @author Zsolt Lengyel (zsolt.lengyel.it@gmail.com)

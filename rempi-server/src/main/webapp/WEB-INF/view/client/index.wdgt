@@ -1,6 +1,6 @@
 
 import org.landa.rempi.server.web.modules.auth.controllers.LoginController;
-import org.landa.rempi.server.web.controller.ClientController;
+import org.landa.rempi.server.web.controller.client.ClientController;
 import io.pallas.core.view.wiidget.tool.Link;
 	
 h1(application.name);
@@ -25,7 +25,7 @@ p{
 }
 */
 
-div(class = row){
+div(class = "row", "ng-controller" = "ClientsCtrl"){
     
     div(class="col-md-6"){
         div(class = "box"){
@@ -34,40 +34,25 @@ div(class = row){
             }
             div(class = "box-body"){
                 
-                table(class="table table-bordered"){
+                table(id = "clients-table", class="table table-bordered"){
                     thead{
                         tr{
-                            th("Client");
-                            th("Connection");
+                            th("Client");                          
                             th("Actions");
                         }
                     }
                     tbody{
                         
-                        // iterate over clients
-                        foreach(clientId -> connId : clients){
-                            
-                            tr{
-                                td(clientId);                                
-                                td(connId);
+                            tr(class = clientId, "ng-repeat" = "(clientId, client) in clients"){
+                                td("ng-bind" = "clientId"); // BUG in wiidget, cannot write {{...}}
                                 // actions
                                 td{
                                     
-                                    button(type="button", class="btn btn-default btn-sm capture-button", "data-clientId"= clientId){ "Capture"; }
-                                    
-                                    div(id="capture-" + clientId);
-                                    
+                                    button(type="button", class="btn btn-default btn-sm capture-button", "ng-click"= "capture(clientId, $event)"){ "Capture"; }                                    
+                                    div(id="capture-{{clientId}}");                                    
                                 }
                                 
-                            }
-                            
-                        }else{
-                            
-                            tr{
-                                td(colspan=3){"No client";}
-                            }
-                            
-                        }
+                            }                      
                         
                     }
                 }

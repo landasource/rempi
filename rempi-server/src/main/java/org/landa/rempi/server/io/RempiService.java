@@ -27,12 +27,15 @@ public class RempiService {
     @Inject
     private Executor executor;
 
+    @Inject
+    private RempiServerHandler handler;
+
     @PostConstruct
     public void startService() {
 
         final int port = 9000;
 
-        rempiServer = new RempiServer(port, executor);
+        rempiServer = new RempiServer(port, executor, handler);
 
         rempiServer.run();
 

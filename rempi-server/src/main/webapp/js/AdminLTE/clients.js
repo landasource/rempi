@@ -1,44 +1,44 @@
-function capture(clientId, btn) {
 
-    var img = $('<img>').attr('src', '/rempi-server/client/capture?clientId=' + clientId).load(function() {
-        $(btn).next('div').html(this);
-    });
-}
-
-jQuery(function() {
-
-//    jQuery(".capture-button").each(function() {
-//        var btn = this;
-//        setInterval(function() {
-//
-//            var $btn = $(this);
-//            if (!$btn.hasClass('btn-danger')) {
-//                var clientId = $(this).attr("data-clientid");
-//                capture(clientId, this);
-//            }
-//        }.bind(btn), 200);
-//
-//    }).click(function() {
-//        $(this).toggleClass('btn-danger');
-//    });
-
+var wsurl = "ws://localhost:8443/rempi-server";
+var app = angular.module('rempi-server', [ 'angular-websocket' ]).config(function(WebSocketProvider) {
+    WebSocketProvider.prefix('').uri(wsurl);
 });
 
-$(function() {
+app.controller('ClientsCtrl', function($scope, WebSocket, $http) {
 
-    var wsurl = "ws://localhost:8443/rempi-server";
-    var ws = new WebSocket(wsurl);
-    ws.onopen = function() {
-        // Web Socket is connected, send data using send()
-        ws.send("Sending first Message");
-        console.log("Message is sent...");
-    };
-    ws.onmessage = function(evt) {        
-        console.log("Message is received...", evt);
-    };
-    ws.onclose = function(evt) {
-        // websocket is closed.
-        console.error("Connection is closed..." + evt.code + ":" + evt.reason);
-    };
+    $scope.clients = {};
+
+    WebSocket.onopen(function() {
+        console.log('connection');
+    });
+
+    WebSocket.onmessage(function(event) {
+        var data = JSON.parse(event.data);
+        switch (data.eventType) {
+
+        case "connected":
+            $scope.clients[data.clientId] = {};
+            break;
+
+        case "disconnected":
+            delete $scope.clients[data.clientId];
+            break;
+        }
+    });
+
+    $http.get('/rempi-server/client/json').success(function(data, status, headers, config) {
+        $scope.clients = data;
+    }).error(function(data, status, headers, config) {
+        // log error
+    });
+
+    $scope.capture = function(clientId, evt) {
+
+        var btn = evt.target;
+
+        var img = $('<img>').attr('src', '/rempi-server/client/capture?clientId=' + clientId).load(function() {
+            $(btn).next('div').html(this);
+        });
+    }
 
 });
