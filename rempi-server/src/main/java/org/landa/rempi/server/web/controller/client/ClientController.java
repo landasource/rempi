@@ -24,15 +24,15 @@ import io.pallas.core.execution.Response;
 import io.pallas.core.execution.Result;
 import io.pallas.core.view.View;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 
-import org.apache.commons.io.IOUtils;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.landa.rempi.comm.impl.CaptureCommand;
 import org.landa.rempi.server.io.RempiServer;
 import org.landa.rempi.server.io.comm.Promise;
@@ -73,20 +73,13 @@ public class ClientController extends BaseController {
                 return new Response() {
 
                     @Override
-                    public void render(final HttpServletResponse response) {
+                    public void render(final HttpResponse response) {
                         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
                         response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
-                        response.setDateHeader("Expires", 0); // Proxies.
+                        //                        response.setDateHeader("Expires", 0); // Proxies.
 
-                        response.setContentType("image/jpeg");
-                        try {
-                            IOUtils.write(originalImage, response.getOutputStream());
-                            response.flushBuffer();
-
-                        } catch (final IOException e) {
-                            e.printStackTrace();
-                        }
-
+                        response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "image/jpeg");
+                        response.setContent(ChannelBuffers.copiedBuffer(originalImage));
                     }
                 };
 
