@@ -25,8 +25,14 @@ app.controller('ClientsCtrl', function($scope, WebSocket, $http) {
             break;
         }
     });
+    
+    $scope.disconnet = function(clientId){
+        
+        $http.get('/stopClient?clientId=' + clientId);
+        
+    }
 
-    $http.get('/rempi-server/client/json').success(function(data, status, headers, config) {
+    $http.get('/client/json').success(function(data, status, headers, config) {
         $scope.clients = data;
     }).error(function(data, status, headers, config) {
         // log error

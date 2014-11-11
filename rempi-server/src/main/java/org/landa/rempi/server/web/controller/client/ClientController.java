@@ -106,10 +106,8 @@ public class ClientController extends BaseController {
         return redirect("/");
     }
 
-    public Redirect stopClient(@QueryParam("clientId") final String clientId) {
+    public void stopClient(@QueryParam("clientId") final String clientId) {
 
         rempiServer.disconnet(clientId);
-
-        return redirect("/");
     }
 }

@@ -5,8 +5,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
@@ -41,13 +39,14 @@ import org.landa.rempi.server.io.event.OnClientDisconnected;
  */
 public class RempiServerHandler extends SimpleChannelUpstreamHandler {
 
-    private static final Logger logger = Logger.getLogger(RempiServerHandler.class.getName());
-
     private final ConcurrentMap<String, Integer> clients = new ConcurrentHashMap<>();
     private final ChannelGroup channels = new DefaultChannelGroup("all");
 
     @Inject
     private BeanManager beanManager;
+
+    @Inject
+    private org.apache.log4j.Logger logger;
 
     /**
      * Key: command id, Value: promise
@@ -132,18 +131,19 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
             }
         }
 
+        channels.remove(e.getChannel());
+
         if (null != clientId) {
             clients.remove(clientId);
             beanManager.fireEvent(new OnClientDisconnected(clientId));
         }
-        channels.remove(e.getChannel());
 
         super.channelDisconnected(ctx, e);
     }
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final ExceptionEvent e) {
-        logger.log(Level.WARNING, "Unexpected exception from downstream.", e.getCause());
+        logger.warn("Unexpected exception from downstream.", e.getCause());
         //        e.getChannel().close();
 
     }
@@ -163,7 +163,7 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
 
         final Channel channel = getChannelByClientId(clientId);
         if (null == channel) {
-            logger.severe("Unknown client: " + clientId);
+            logger.error("Unknown client: " + clientId);
             throw new IllegalArgumentException("Unknown client:" + clientId);
         } else if (channel.isWritable()) {
 
@@ -181,13 +181,10 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
     public void disconnetClient(final String clientId) {
         final Channel channel = getChannelByClientId(clientId);
         if (null == channel) {
-            logger.severe("Unknown client: " + clientId);
+            logger.error("Unknown client: " + clientId);
         } else if (channel.isConnected()) {
-            clients.remove(clientId);
-            channels.remove(channel);
             channel.disconnect();
         }
-
     }
 
     private Channel getChannelByClientId(final String clientId) {

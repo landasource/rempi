@@ -47,7 +47,7 @@ div(class = "row", "ng-controller" = "ClientsCtrl"){
                                 td("ng-bind" = "clientId"); // BUG in wiidget, cannot write {{...}}
                                 // actions
                                 td{
-                                    
+                                    a("ng-click"="disconnet(clientId)", class="btn btn-danger btn-sm"){"Disconnect";}
                                     button(type="button", class="btn btn-default btn-sm capture-button", "ng-click"= "capture(clientId, $event)"){ "Capture"; }                                    
                                     div(id="capture-{{clientId}}");                                    
                                 }
