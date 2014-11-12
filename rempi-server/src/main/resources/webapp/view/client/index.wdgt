@@ -44,7 +44,7 @@ div(class = "row", "ng-controller" = "ClientsCtrl"){
                     tbody{
                         
                             tr(class = clientId, "ng-repeat" = "(clientId, client) in clients"){
-                                td("ng-bind" = "clientId"); // BUG in wiidget, cannot write {{...}}
+                                td("{{clientId}}");
                                 // actions
                                 td{
                                     a("ng-click"="disconnet(clientId)", class="btn btn-danger btn-sm"){"Disconnect";}
