@@ -1,5 +1,5 @@
 
-var wsurl = "ws://localhost:1234/ws";
+var wsurl = "ws://localhost:1234/ws/rempi";
 var app = angular.module('rempi-server', [ 'angular-websocket' ]).config(function(WebSocketProvider) {
     WebSocketProvider.prefix('').uri(wsurl);
 });

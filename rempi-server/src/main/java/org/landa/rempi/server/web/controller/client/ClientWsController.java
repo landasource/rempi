@@ -18,10 +18,10 @@ import org.landa.rempi.server.web.controller.client.event.ClientDisconnectedMess
 public class ClientWsController {
 
     @Inject
-    @WebSocket(path = "/rempi-server")
+    @WebSocket(path = "/ws/rempi")
     private Broadcaster broadcaster;
 
-    public void onWsConnection(@Observes @WebSocket(path = "/rempi-server") final OnOpen event) {
+    public void onWsConnection(@Observes @WebSocket(path = "/ws/rempi") final OnOpen event) {
 
     }
 
