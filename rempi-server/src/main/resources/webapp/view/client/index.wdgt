@@ -3,7 +3,16 @@ import org.landa.rempi.server.web.modules.auth.controllers.LoginController;
 import org.landa.rempi.server.web.controller.client.ClientController;
 import io.pallas.core.view.wiidget.tool.Link;
 	
-h1(application.name);
+h2(class="ui header"){
+    i(class="settings icon");
+    div( class="content"){
+        `application.name`;
+  
+        div(class="sub header"){
+            "Manage your devices";
+        }
+    }
+}
 
 /*
 p{
@@ -27,7 +36,7 @@ p{
 
 div(class = "row", "ng-controller" = "ClientsCtrl"){
     
-    table(id = "clients-table", class="ui table segment"){
+    table(id = "clients-table", class="ui table basic segment"){
         thead{
             tr{
                 th("Client");                          
@@ -36,16 +45,24 @@ div(class = "row", "ng-controller" = "ClientsCtrl"){
         }
         tbody{
             
-                tr(class = clientId, "ng-repeat" = "(clientId, client) in clients"){
+                tr(class = "positive", "ng-repeat" = "(clientId, client) in clients"){
                     td("{{clientId}}");
                     // actions
                     td{
-                        div(class= "ui buttons"){
-                            a("ng-click"="disconnet(clientId)", class="ui button red"){"Disconnect";}
-                            div(class="or");
-                            button(type="button", class="ui button positive", "ng-click"= "capture(clientId, $event)"){ "Capture"; }                                    
-                            div(id="capture-{{clientId}}");
+                      
+                        a("ng-click"="disconnet(clientId)", class="ui small labeled icon button red"){
+                            i(class="pause icon");
+                            "Disconnect";
                         }
+                      
+                        button(type="button", class="ui small labeled icon button positive", "ng-click"= "capture(clientId, $event)"){
+                           
+                            "Capture";
+                            i(class="camera icon");
+                            
+                        }                                    
+                        div(id="capture-{{clientId}}");
+                      
                     }
                         
                 }                      

@@ -4,7 +4,14 @@ import com.landasource.wiidget.library.template.SimplePart;
 
 Template(value = "layout/main.html", removePlaceholders = false){
 
-	Part("body"){		
+	Part("body"){	
+	
+	
+		div(class="ui menu"){
+		  a(class="item"){"Home";}
+		  a(class="item"){"Inbox";}
+		}
+		
 		`content`;		
 	}
 	
