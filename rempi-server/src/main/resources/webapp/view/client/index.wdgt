@@ -27,44 +27,30 @@ p{
 
 div(class = "row", "ng-controller" = "ClientsCtrl"){
     
-    div(class="col-md-6"){
-        div(class = "box"){
-            div(class = "header"){
-                h3("Clients");
+    table(id = "clients-table", class="ui table segment"){
+        thead{
+            tr{
+                th("Client");                          
+                th("Actions");
             }
-            div(class = "box-body"){
-                
-                table(id = "clients-table", class="table table-bordered"){
-                    thead{
-                        tr{
-                            th("Client");                          
-                            th("Actions");
+        }
+        tbody{
+            
+                tr(class = clientId, "ng-repeat" = "(clientId, client) in clients"){
+                    td("{{clientId}}");
+                    // actions
+                    td{
+                        div(class= "ui buttons"){
+                            a("ng-click"="disconnet(clientId)", class="ui button red"){"Disconnect";}
+                            div(class="or");
+                            button(type="button", class="ui button positive", "ng-click"= "capture(clientId, $event)"){ "Capture"; }                                    
+                            div(id="capture-{{clientId}}");
                         }
                     }
-                    tbody{
                         
-                            tr(class = clientId, "ng-repeat" = "(clientId, client) in clients"){
-                                td("{{clientId}}");
-                                // actions
-                                td{
-                                    a("ng-click"="disconnet(clientId)", class="btn btn-danger btn-sm"){"Disconnect";}
-                                    button(type="button", class="btn btn-default btn-sm capture-button", "ng-click"= "capture(clientId, $event)"){ "Capture"; }                                    
-                                    div(id="capture-{{clientId}}");                                    
-                                }
-                                
-                            }                      
-                        
-                    }
-                }
+                }                      
                 
             }
-            
-        }
     }
-    
-    div(class="col-md-6"){
-        
-    }
-    
-    
+ 
 }

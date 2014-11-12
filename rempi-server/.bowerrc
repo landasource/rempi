@@ -1,4 +1,4 @@
 {
-  "directory": "src/main/webapp/js/vendor/",
+  "directory": "src/main/resources/webapp/static/js/vendor/",
   "analytics": false
 }

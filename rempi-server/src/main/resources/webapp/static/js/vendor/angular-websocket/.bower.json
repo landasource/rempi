@@ -27,6 +27,5 @@
   },
   "_source": "git://github.com/gdi2290/angular-websocket.git",
   "_target": "~0.0.5",
-  "_originalSource": "angular-websocket",
-  "_direct": true
+  "_originalSource": "angular-websocket"
 }
