@@ -1,5 +1,5 @@
 
-var wsurl = "ws://localhost:8443/rempi-server";
+var wsurl = "ws://localhost:1234/ws";
 var app = angular.module('rempi-server', [ 'angular-websocket' ]).config(function(WebSocketProvider) {
     WebSocketProvider.prefix('').uri(wsurl);
 });
@@ -13,6 +13,8 @@ app.controller('ClientsCtrl', function($scope, WebSocket, $http) {
     });
 
     WebSocket.onmessage(function(event) {
+    	console.log("WS event happened", event);
+    	
         var data = JSON.parse(event.data);
         switch (data.eventType) {
 

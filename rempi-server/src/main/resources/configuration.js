@@ -13,12 +13,13 @@ var configuration = {
         	}
         },
         
-        components : {
-            
-            viewFactory : {
-                viewFileSuffix : '.wdgt'
-            }
-            
-        }
-    }    
+    },    
+
+	viewFactory : {
+	    viewFileSuffix : '.wdgt'
+	},
+	
+	httpServer : {
+		port : 1234
+	}
 };
