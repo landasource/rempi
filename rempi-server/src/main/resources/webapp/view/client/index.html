@@ -1,0 +1,47 @@
+	
+<h2 class="ui header">
+    <i class="settings icon"></i>
+    <div class="content">
+        ${application.name}
+  
+        <div class="sub header">
+            Manage your devices
+        </div>    
+</h2>
+
+<div class = "row" ng-controller = "ClientsCtrl">
+    
+    <table id="clients-table" class="ui table basic segment">
+        <thead>
+            <tr>
+                <th>Client</th>                          
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+                <tr class = "positive" ng-repeat="(clientId, client) in clients">
+                    <td>{{clientId}}</td>
+
+                    <td>
+                      
+                        <a ng-click="disconnet(clientId)" class="ui small labeled icon button red">
+                            <i class="pause icon"></i>
+                            Disconnect
+                        </a>
+                      
+                        <button type="button" class="ui small labeled icon button positive" ng-click="capture(clientId, $event)">                           
+                            Capture
+                            <i class="camera icon"></i>
+                            
+                        </button>                                    
+                        <div id="capture-{{clientId}}"></div>
+                      
+                    </td>
+                        
+                </tr>                  
+                
+           </tbody>
+    </table>
+ 
+</div>

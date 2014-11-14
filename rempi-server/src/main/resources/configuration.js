@@ -17,7 +17,7 @@ var configuration = {
     
 
 	viewFactory : {
-	    viewFileSuffix : '.ftl',
+	    viewFileSuffix : '.html',
 	    engine : 'freemarker'
 	    
 	    	
