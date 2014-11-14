@@ -4,3 +4,10 @@ body{
   padding: 0px;
   color: #555555;  
 }
+
+.toasts{
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	width: 300px;
+}

@@ -2,6 +2,11 @@ package org.landa.rempi.client;
 
 import java.util.UUID;
 
+/**
+ * Main entry point of application.
+ * 
+ * @author Zsolt Lengyel (zsolt.lengyel.it@gmail.com)
+ */
 public class Main {
 
     public static void main(final String[] args) throws Exception {

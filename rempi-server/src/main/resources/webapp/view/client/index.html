@@ -17,13 +17,20 @@
 			</tr>
 
 			<tr>
-				<th><input type="text" ng-model="clientNameFilter"></th>
+				<th>
+					<div class="ui mini icon input">
+						<input type="text" ng-model="clientNameFilter" placeholder="Search..."> <i
+							class="search icon"></i>
+					</div>
+
+				</th>
 				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 
-			<tr class="positive" ng-repeat="(clientId, client) in clients | filter:clientNameFilter">
+			<tr class="positive"
+				ng-repeat="(clientId, client) in filteredClients()">
 				<td>{{clientId}}</td>
 
 				<td><a ng-click="disconnet(clientId)"

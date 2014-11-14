@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
@@ -24,6 +25,7 @@ import org.jboss.netty.util.TimerTask;
 import org.landa.rempi.client.executors.Commandor;
 import org.landa.rempi.client.modules.auth.Authenticator;
 import org.landa.rempi.comm.Command;
+import org.landa.rempi.comm.ErrorMessage;
 import org.landa.rempi.comm.ServerGreeting;
 
 /**
@@ -125,6 +127,13 @@ public class RempiClientHandler extends SimpleChannelUpstreamHandler {
         } else {
             logger.log(Level.SEVERE, "Unexpected error", cause);
         }
-        ctx.getChannel().close();
+
+        // notify server
+        final Channel channel = ctx.getChannel();
+        if (channel.isWritable()) {
+            channel.write(new ErrorMessage("Error", cause));
+        }
+
+        //ctx.getChannel().close();
     }
 }

@@ -1,6 +1,5 @@
 package org.landa.rempi.server.web.controller.client;
 
-import io.pallas.core.util.Json;
 import io.pallas.core.ws.Broadcaster;
 import io.pallas.core.ws.events.OnOpen;
 import io.pallas.core.ws.events.WebSocket;
@@ -11,8 +10,10 @@ import javax.inject.Inject;
 
 import org.landa.rempi.server.io.event.OnClientConnected;
 import org.landa.rempi.server.io.event.OnClientDisconnected;
+import org.landa.rempi.server.io.event.OnClientError;
 import org.landa.rempi.server.web.controller.client.event.ClientConnectedMessage;
 import org.landa.rempi.server.web.controller.client.event.ClientDisconnectedMessage;
+import org.landa.rempi.server.web.controller.client.event.ClientErrorMessage;
 
 @ApplicationScoped
 public class ClientWsController {
@@ -25,18 +26,19 @@ public class ClientWsController {
 
     }
 
-    public void onCLientConnected(@Observes final OnClientConnected clientConnected) {
-
-        final String json = Json.create().toJsonText(new ClientConnectedMessage(clientConnected.getClientId()));
-
-        broadcaster.broadcast(json);
+    public void onClientConnected(@Observes final OnClientConnected clientConnected) {
+        broadcaster.broadcastJson(new ClientConnectedMessage(clientConnected.getClientId()));
     }
 
     public void onClientDicsonnected(@Observes final OnClientDisconnected disconnected) {
+        broadcaster.broadcastJson(new ClientDisconnectedMessage(disconnected.getClientId()));
+    }
 
-        final String json = Json.create().toJsonText(new ClientDisconnectedMessage(disconnected.getClientId()));
-
-        broadcaster.broadcast(json);
+    /**
+     * @param clientError
+     */
+    public void onClientError(@Observes final OnClientError clientError) {
+        broadcaster.broadcastJson(new ClientErrorMessage(clientError.getClientId(), clientError.getErrorMessage()));
     }
 
 }

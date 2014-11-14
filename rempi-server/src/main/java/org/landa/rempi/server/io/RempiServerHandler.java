@@ -25,6 +25,8 @@ import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.handler.ssl.SslHandler;
 import org.landa.rempi.comm.Authentication;
 import org.landa.rempi.comm.Command;
+import org.landa.rempi.comm.ErrorMessage;
+import org.landa.rempi.comm.InfoMessage;
 import org.landa.rempi.comm.ServerGreeting;
 import org.landa.rempi.comm.SyncCommand;
 import org.landa.rempi.comm.SyncResult;
@@ -32,6 +34,7 @@ import org.landa.rempi.server.io.comm.Promise;
 import org.landa.rempi.server.io.comm.WaitingPromise;
 import org.landa.rempi.server.io.event.OnClientConnected;
 import org.landa.rempi.server.io.event.OnClientDisconnected;
+import org.landa.rempi.server.io.event.OnClientError;
 
 /**
  * Handles both client-side and server-side handler depending on which
@@ -114,8 +117,18 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
             final OnClientConnected connected = new OnClientConnected(clientId);
             beanManager.fireEvent(connected);
 
+        } else if (message instanceof ErrorMessage) {
+
+            final OnClientError clientError = new OnClientError(getClientIdOfChannel(channelId), (ErrorMessage) message);
+            beanManager.fireEvent(clientError);
+
+        } else if (message instanceof InfoMessage) {
+
+            logger.info("Stati info from client: " + message.toString());
+
         } else {
             logger.info("Message from client: " + message.toString());
+
         }
     }
 
@@ -194,6 +207,21 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
             return channels.find(channelId);
         }
 
+        return null;
+    }
+
+    /**
+     * @param channelId
+     * @return
+     */
+    private String getClientIdOfChannel(final Integer channelId) {
+
+        for (final Entry<String, Integer> entry : clients.entrySet()) {
+
+            if (entry.getValue().equals(channelId)) {
+                return entry.getKey();
+            }
+        }
         return null;
     }
 

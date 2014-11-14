@@ -20,24 +20,30 @@
 <link rel="stylesheet" type="text/css"
 	href="${contextPathPrefix}/static/css/main.css">
 
-
-<script src="${contextPathPrefix}/static/js/jquery.js"></script>
-<script src="${contextPathPrefix}/static/js/semantic.js"></script>
-<script
-	src="${contextPathPrefix}/static/js/vendor/angular/angular.min.js"></script>
-<script
-	src="${contextPathPrefix}/static/js/vendor/angular-websocket/angular-websocket.js"></script>
-<script src="${contextPathPrefix}/static/js/app/clients.js"></script>
-
-
 </head>
 
-<div class="ui page grid">
+<div class="ui grid">
 	<div class="four wide column"><#include "../common/menu.html"></div>
 	<div class="twelve wide column">
 		<div class="ui segment">${content}</div>
 	</div>
 </div>
+
+<div class="toasts" ng-controller="ToastCtrl">
+
+	<div class="ui small icon compact message" ng-class="{red : message.type == 'error'}" ng-repeat="(time, message) in messages">
+		<i class="close icon" ng-click="close(time)"></i>
+		<i class="inbox icon"></i>
+		<div class="content">
+			<div class="header">{{message.title}}</div>
+			<p>{{message.description}}</p>
+		</div>
+	</div>
+
+</div>
+
+<script src="${contextPathPrefix}/static/js/require.js"
+	data-main="${contextPathPrefix}/static/js/clients/main.js"></script>
 
 </body>
 
