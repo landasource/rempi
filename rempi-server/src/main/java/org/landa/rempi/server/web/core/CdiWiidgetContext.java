@@ -6,7 +6,7 @@ import javax.enterprise.inject.Specializes;
 import org.apache.shiro.SecurityUtils;
 
 @Specializes
-public class CdiWiidgetContext extends io.pallas.core.view.wiidget.integration.CdiWiidgetContext {
+public class CdiWiidgetContext extends io.pallas.core.view.engines.wiidget.integration.CdiWiidgetContext {
 
     @PostConstruct
     private void init() {

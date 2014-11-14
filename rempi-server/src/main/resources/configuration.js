@@ -13,10 +13,14 @@ var configuration = {
         	}
         },
         
-    },    
+    },   
+    
 
 	viewFactory : {
-	    viewFileSuffix : '.wdgt'
+	    viewFileSuffix : '.ftl',
+	    engine : 'freemarker'
+	    
+	    	
 	},
 	
 	httpServer : {
