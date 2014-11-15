@@ -4,9 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.netty.channel.Channel;
+import org.landa.rempi.client.modules.stream.live.LiveStreamHandler;
 import org.landa.rempi.client.modules.webcam.Capturer;
 import org.landa.rempi.comm.Command;
 import org.landa.rempi.comm.impl.CaptureCommand;
+import org.landa.rempi.comm.livestream.StartStreamCommand;
+import org.landa.rempi.comm.livestream.StopStreamCommand;
 
 /**
  * @author Zsolt Lengyel (zsolt.lengyel.it@gmail.com)
@@ -18,6 +21,9 @@ public class Commandor {
 
     static {
         executors.put(CaptureCommand.class, Capturer.class);
+
+        executorsInstances.put(StartStreamCommand.class, LiveStreamHandler.instance().startExecutor());
+        executorsInstances.put(StopStreamCommand.class, LiveStreamHandler.instance().stopExecutor());
     }
 
     public static <T extends Command> void addExecutor(final Class<T> command, final Executor<T> executor) {

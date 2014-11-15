@@ -34,6 +34,8 @@ import javax.ws.rs.QueryParam;
 
 import org.apache.commons.io.IOUtils;
 import org.landa.rempi.comm.impl.CaptureCommand;
+import org.landa.rempi.comm.livestream.StartStreamCommand;
+import org.landa.rempi.comm.livestream.StopStreamCommand;
 import org.landa.rempi.server.io.RempiServer;
 import org.landa.rempi.server.io.comm.Promise;
 
@@ -100,14 +102,19 @@ public class ClientController extends BaseController {
     }
 
     public Redirect multicast(@QueryParam("command") final String command) {
-
         rempiServer.broadcast(command);
-
         return redirect("/");
     }
 
-    public void stopClient(@QueryParam("clientId") final String clientId) {
+    public void startStream(@QueryParam("clientId") final String clientId) {
+        rempiServer.sendCommand(clientId, new StartStreamCommand());
+    }
 
+    public void stopStream(@QueryParam("clientId") final String clientId) {
+        rempiServer.sendCommand(clientId, new StopStreamCommand());
+    }
+
+    public void stopClient(@QueryParam("clientId") final String clientId) {
         rempiServer.disconnet(clientId);
     }
 }

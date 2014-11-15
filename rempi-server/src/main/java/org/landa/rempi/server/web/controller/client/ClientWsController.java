@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import org.landa.rempi.server.io.event.OnClientConnected;
 import org.landa.rempi.server.io.event.OnClientDisconnected;
 import org.landa.rempi.server.io.event.OnClientError;
+import org.landa.rempi.server.io.livestream.OnLiveStreamFrame;
 import org.landa.rempi.server.web.controller.client.event.ClientConnectedMessage;
 import org.landa.rempi.server.web.controller.client.event.ClientDisconnectedMessage;
 import org.landa.rempi.server.web.controller.client.event.ClientErrorMessage;
@@ -39,6 +40,10 @@ public class ClientWsController {
      */
     public void onClientError(@Observes final OnClientError clientError) {
         broadcaster.broadcastJson(new ClientErrorMessage(clientError.getClientId(), clientError.getErrorMessage()));
+    }
+
+    public void onLiveStreamImage(@Observes final OnLiveStreamFrame frame) {
+        System.out.println("ClientWsController.onLiveStreamImage()");
     }
 
 }

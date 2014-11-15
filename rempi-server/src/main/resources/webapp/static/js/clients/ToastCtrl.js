@@ -14,7 +14,7 @@ define(function(){
         
            $timeout(function(){
                delete $scope.messages[time];
-           }, 100000);
+           }, 8000);
            
            
         });        

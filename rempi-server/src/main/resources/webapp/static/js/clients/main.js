@@ -8,7 +8,7 @@ require.config({
     },
     shim : {
         'angular-websocket' : {
-            deps : ['angular']
+            deps : [ 'angular' ]
         },
         'angular' : {
             exports : 'angular'
@@ -19,18 +19,17 @@ require.config({
     }
 });
 
-require([ 'jquery', 'angular', 'ToastCtrl', 'angular-websocket', 'semantic'], function($, angular, ToastCtrl) {
-   
+require([ 'jquery', 'angular', 'ToastCtrl', 'angular-websocket', 'semantic' ], function($, angular, ToastCtrl) {
+
     var app = angular.module('rempi-server', [ 'angular-websocket' ]);
-    
+
     var serverAddress = location.host;
-    var wsAddress = 'ws://'  + serverAddress + '/ws/rempi';
- 
-    
+    var wsAddress = 'ws://' + serverAddress + '/ws/rempi';
+
     app.config(function(WebSocketProvider) {
         WebSocketProvider.prefix('').uri(wsAddress);
     });
-   
+
     app.filter('empty', function() {
         return function(input) {
             return jQuery.isEmptyObject(input);
@@ -38,7 +37,7 @@ require([ 'jquery', 'angular', 'ToastCtrl', 'angular-websocket', 'semantic'], fu
     });
 
     app.controller('ToastCtrl', ToastCtrl);
-    
+
     app.controller('ClientsCtrl', function($scope, WebSocket, $http, $rootScope) {
 
         $scope.clients = {};
@@ -95,18 +94,25 @@ require([ 'jquery', 'angular', 'ToastCtrl', 'angular-websocket', 'semantic'], fu
         });
 
         $scope.capture = function(clientId, evt) {
-
             var btn = evt.target;
 
             var img = $('<img>').attr('src', '/rempi-server/client/capture?clientId=' + clientId).load(function() {
-                $(btn).next('div').html(this);
+                $(btn).next('span').html(this);
             });
-        }
+        };
+
+        $scope.startStream = function(clientId) {
+            $http.get('/client/startStream?clientId=' + clientId);
+        };
+
+        $scope.stopStream = function(clientId) {
+            $http.get('/client/stopStream?clientId=' + clientId);
+        };
 
     });
-    
-    app.run(function(){
-        
+
+    app.run(function() {
+
     });
 
     $('.ui.dropdown').dropdown();

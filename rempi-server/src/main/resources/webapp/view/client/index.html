@@ -19,8 +19,8 @@
 			<tr>
 				<th>
 					<div class="ui mini icon input">
-						<input type="text" ng-model="clientNameFilter" placeholder="Search..."> <i
-							class="search icon"></i>
+						<input type="text" ng-model="clientNameFilter"
+							placeholder="Search..."> <i class="search icon"></i>
 					</div>
 
 				</th>
@@ -38,7 +38,16 @@
 
 					<button type="button" class="ui tiny button positive"
 						ng-click="capture(clientId, $event)">Capture</button>
-					<div id="capture-{{clientId}}"></div></td>
+					<span id="capture-{{clientId}}"></span>
+
+					<div class="ui tiny icon buttons">
+						<div class="ui orange button" ng-click="startStream(clientId)">
+							<i class="play icon"></i>
+						</div>
+						<div class="ui purple button" ng-click="stopStream(clientId)">
+							<i class="stop icon"></i>
+						</div>
+					</div></td>
 
 			</tr>
 

@@ -21,13 +21,13 @@ import javax.net.ssl.SSLEngine;
 
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.handler.codec.serialization.ClassResolvers;
-import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
+import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 import org.jboss.netty.handler.ssl.SslHandler;
-import org.landa.rempi.comm.Command;
+import org.landa.rempi.comm.livestream.handler.StreamFrameListener;
 import org.landa.rempi.comm.ssh.SecureSslContextFactory;
 import org.landa.rempi.server.io.RempiServerHandler;
+import org.landa.rempi.server.io.livestream.Decoder;
 
 /**
  * Creates a newly configured {@link ChannelPipeline} for a new channel.
@@ -36,8 +36,14 @@ public class SecureServerPipelineFactory implements ChannelPipelineFactory {
 
     private final RempiServerHandler rempiServerHandler;
 
-    public SecureServerPipelineFactory(final RempiServerHandler rempiServerHandler) {
+    private final StreamFrameListener streamFrameListener;
+
+    private final Decoder decoder;
+
+    public SecureServerPipelineFactory(final RempiServerHandler rempiServerHandler, final StreamFrameListener streamFrameListener, final Decoder decoder) {
         this.rempiServerHandler = rempiServerHandler;
+        this.streamFrameListener = streamFrameListener;
+        this.decoder = decoder;
     }
 
     @Override
@@ -58,9 +64,12 @@ public class SecureServerPipelineFactory implements ChannelPipelineFactory {
 
         pipeline.addLast("ssl", new SslHandler(engine));
 
+        //add the frame codec
+        pipeline.addLast("frame decoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+
         // On top of the SSL handler, add the text line codec.
         //        pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
-        pipeline.addLast("decoder", new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(Command.class.getClassLoader())));
+        pipeline.addLast("decoder", decoder);
         pipeline.addLast("encoder", new ObjectEncoder());
 
         // and then business logic.

@@ -8,7 +8,9 @@ import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.landa.rempi.comm.Command;
 import org.landa.rempi.comm.SyncCommand;
+import org.landa.rempi.comm.livestream.handler.StreamFrameListener;
 import org.landa.rempi.server.io.comm.Promise;
+import org.landa.rempi.server.io.livestream.Decoder;
 import org.landa.rempi.server.io.ssh.SecureServerPipelineFactory;
 
 /**
@@ -21,17 +23,20 @@ public class RempiServer {
 
     private final RempiServerHandler rempiServerHandler;
     private final Executor executor;
+    private StreamFrameListener streamListener;
+    private final Decoder decoder;
 
-    public RempiServer(final int port, final Executor executor, final RempiServerHandler handler) {
+    public RempiServer(final int port, final Executor executor, final RempiServerHandler handler, final Decoder decoder) {
         this.port = port;
         this.executor = executor;
         rempiServerHandler = handler;
+        this.decoder = decoder;
     }
 
     public void run() {
         bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(executor, executor));
 
-        bootstrap.setPipelineFactory(new SecureServerPipelineFactory(rempiServerHandler));
+        bootstrap.setPipelineFactory(new SecureServerPipelineFactory(rempiServerHandler, streamListener, decoder));
 
         // Bind and start to accept incoming connections.
         bootstrap.bind(new InetSocketAddress(port));
