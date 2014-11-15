@@ -11,7 +11,6 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
-import org.landa.rempi.server.io.livestream.Decoder;
 
 /**
  * @author Zsolt Lengyel (zsolt.lengyel.it@gmail.com)
@@ -31,15 +30,12 @@ public class RempiService {
     @Inject
     private RempiServerHandler handler;
 
-    @Inject
-    private Decoder decoder;
-
     @PostConstruct
     private void startService() {
 
         final int port = 9000;
 
-        rempiServer = new RempiServer(port, executor, handler, decoder);
+        rempiServer = new RempiServer(port, executor, handler);
 
         rempiServer.run();
 

@@ -7,11 +7,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
-import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelFuture;
@@ -38,8 +36,6 @@ import org.landa.rempi.server.io.comm.WaitingPromise;
 import org.landa.rempi.server.io.event.OnClientConnected;
 import org.landa.rempi.server.io.event.OnClientDisconnected;
 import org.landa.rempi.server.io.event.OnClientError;
-import org.landa.rempi.server.io.livestream.Decoder;
-import org.landa.rempi.server.io.livestream.ObserverStreamFrameListener;
 
 /**
  * Handles both client-side and server-side handler depending on which
@@ -56,12 +52,6 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
 
     @Inject
     private org.apache.log4j.Logger logger;
-
-    @Inject
-    private ObserverStreamFrameListener frameListener;
-
-    @Inject
-    private Instance<Decoder> liveStreamDecoder;
 
     /**
      * Key: command id, Value: promise
@@ -115,10 +105,6 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
             } else {
                 logger.info("No promise waiting for:" + syncResult.getId());
             }
-
-        } else if (message instanceof ChannelBuffer) {
-
-            liveStreamDecoder.get().decode(getClientIdOfChannel(channelId), message);
 
         } else if (message instanceof Authentication) {
             final Authentication authentication = (Authentication) message;

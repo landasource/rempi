@@ -23,13 +23,12 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
 import org.jboss.netty.handler.codec.serialization.ClassResolvers;
 import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
+import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 import org.jboss.netty.handler.ssl.SslHandler;
 import org.jboss.netty.util.Timer;
 import org.landa.rempi.client.RempiClientHandler;
-import org.landa.rempi.client.coding.Encoder;
 import org.landa.rempi.comm.Command;
 import org.landa.rempi.comm.ssh.SecureSslContextFactory;
 
@@ -62,12 +61,10 @@ public class SecureClientPipelineFactory implements ChannelPipelineFactory {
 
         pipeline.addLast("ssl", new SslHandler(engine));
 
-        pipeline.addLast("frame encoder", new LengthFieldPrepender(4, false));
-
         // On top of the SSL handler, add the text line codec.
         //        pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
         pipeline.addLast("decoder", new ObjectDecoder(ClassResolvers.softCachingResolver(Command.class.getClassLoader())));
-        pipeline.addLast("encoder", new Encoder());
+        pipeline.addLast("encoder", new ObjectEncoder());
 
         // and then business logic.
         pipeline.addLast("handler", clientHandler);
