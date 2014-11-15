@@ -38,12 +38,16 @@ import org.landa.rempi.comm.livestream.StartStreamCommand;
 import org.landa.rempi.comm.livestream.StopStreamCommand;
 import org.landa.rempi.server.io.RempiServer;
 import org.landa.rempi.server.io.comm.Promise;
+import org.landa.rempi.server.io.livestream.LiveStreamReceiverServer;
 
 @Controller("client")
 public class ClientController extends BaseController {
 
     @Inject
     private RempiServer rempiServer;
+
+    @Inject
+    private LiveStreamReceiverServer liveStreamReceiverServer;
 
     public View index() {
         return view().set("clients", rempiServer.getClients());
@@ -76,7 +80,8 @@ public class ClientController extends BaseController {
 
                     @Override
                     public void render(final HttpServletResponse response) {
-                        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+                        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP
+                                                                                                    // 1.1.
                         response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
                         response.setDateHeader("Expires", 0); // Proxies.
 
@@ -107,7 +112,7 @@ public class ClientController extends BaseController {
     }
 
     public void startStream(@QueryParam("clientId") final String clientId) {
-        rempiServer.sendCommand(clientId, new StartStreamCommand());
+        rempiServer.sendCommand(clientId, new StartStreamCommand(liveStreamReceiverServer.getPort()));
     }
 
     public void stopStream(@QueryParam("clientId") final String clientId) {

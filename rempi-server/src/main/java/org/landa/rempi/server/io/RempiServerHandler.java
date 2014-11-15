@@ -159,7 +159,7 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final ExceptionEvent e) {
         logger.warn("Unexpected exception from downstream.", e.getCause());
-        //        e.getChannel().close();
+        // e.getChannel().close();
 
     }
 
@@ -240,20 +240,21 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
 
         @Override
         public void operationComplete(final ChannelFuture future) throws Exception {
+            final Channel channel = future.getChannel();
             if (future.isSuccess()) {
                 // Once session is secured, send a greeting.
                 final String welcome = "Welcome to " + InetAddress.getLocalHost().getHostName() + " secure Rempi server!\n" + "Your session is protected by "
                         + sslHandler.getEngine().getSession().getCipherSuite() + " cipher suite.\n";
 
-                future.getChannel().write(new ServerGreeting(welcome));
+                channel.write(new ServerGreeting(welcome));
 
                 // Register the channel to the global channel list
                 // so the channel received the messages from others.
-                channelGroup.add(future.getChannel());
+                channelGroup.add(channel);
 
             } else {
                 logger.info("Greeting close immediately");
-                future.getChannel().close();
+                channel.close();
             }
         }
     }

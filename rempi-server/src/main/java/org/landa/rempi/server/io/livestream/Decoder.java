@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
+import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
 import org.landa.rempi.comm.livestream.handler.frame.FrameDecoder;
 import org.landa.rempi.server.io.RempiServerHandler;
 
@@ -23,7 +23,7 @@ import com.xuggle.xuggler.video.ConverterFactory;
 import com.xuggle.xuggler.video.ConverterFactory.Type;
 import com.xuggle.xuggler.video.IConverter;
 
-public class Decoder extends ObjectDecoder {
+public class Decoder extends OneToOneDecoder {
 
     @Inject
     private org.apache.log4j.Logger logger;
@@ -49,69 +49,62 @@ public class Decoder extends ObjectDecoder {
     public Decoder() {
         super();
 
-        //        if (internalFrameDecoder) {
+        // if (internalFrameDecoder) {
         frameDecoder = new FrameDecoder(4);
-        //        } else {
-        //            frameDecoder = null;
-        //        }
-        //        if (decodeInOtherThread) {
+        // } else {
+        // frameDecoder = null;
+        // }
+        // if (decodeInOtherThread) {
 
-        //        } else {
-        //            decodeWorker = null;
-        //        }
+        // } else {
+        // decodeWorker = null;
+        // }
 
         initialize();
     }
 
     private void initialize() {
-        //iStreamCoder.setNumPicturesInGroupOfPictures(20);
-        //iStreamCoder.setBitRate(250000);
-        //iStreamCoder.setBitRateTolerance(9000);
-        //iStreamCoder.setPixelType(IPixelFormat.Type.YUV420P);
-        //iStreamCoder.setHeight(dimension.height);
-        //iStreamCoder.setWidth(dimension.width);
-        //iStreamCoder.setFlag(IStreamCoder.Flags.FLAG_QSCALE, true);
-        //iStreamCoder.setGlobalQuality(0);
-        //rate
-        //IRational rate = IRational.make(25, 1);
-        //iStreamCoder.setFrameRate(rate);
-        //time base
-        //iStreamCoder.setAutomaticallyStampPacketsForStream(true);
-        //iStreamCoder.setTimeBase(IRational.make(rate.getDenominator(),rate.getNumerator()));
+        // iStreamCoder.setNumPicturesInGroupOfPictures(20);
+        // iStreamCoder.setBitRate(250000);
+        // iStreamCoder.setBitRateTolerance(9000);
+        // iStreamCoder.setPixelType(IPixelFormat.Type.YUV420P);
+        // iStreamCoder.setHeight(dimension.height);
+        // iStreamCoder.setWidth(dimension.width);
+        // iStreamCoder.setFlag(IStreamCoder.Flags.FLAG_QSCALE, true);
+        // iStreamCoder.setGlobalQuality(0);
+        // rate
+        // IRational rate = IRational.make(25, 1);
+        // iStreamCoder.setFrameRate(rate);
+        // time base
+        // iStreamCoder.setAutomaticallyStampPacketsForStream(true);
+        // iStreamCoder.setTimeBase(IRational.make(rate.getDenominator(),rate.getNumerator()));
         iStreamCoder.open(null, null);
     }
 
     @Override
-    protected Object decode(final ChannelHandlerContext ctx, final Channel channel, final ChannelBuffer buffer) throws Exception {
+    protected Object decode(final ChannelHandlerContext ctx, final Channel channel, final Object frameBuffer) throws Exception {
 
-        return super.decode(ctx, channel, buffer);
-    }
-
-    public void decode(final String clientId, final Object msg) throws Exception {
-
-        if (msg == null) {
+        if (frameBuffer == null) {
             throw new NullPointerException("you cannot pass into an null to the decode");
         }
-        ChannelBuffer frameBuffer;
+        ChannelBuffer buffer = (ChannelBuffer) frameBuffer;
         if (frameDecoder != null) {
-            frameBuffer = frameDecoder.decode((ChannelBuffer) msg);
-            if (frameBuffer == null) {
-                return;
+            buffer = frameDecoder.decode((ChannelBuffer) frameBuffer);
+            if (buffer == null) {
+                return null;
             }
 
-        } else {
-            frameBuffer = (ChannelBuffer) msg;
         }
 
-        final int size = frameBuffer.readableBytes();
+        final int size = buffer.readableBytes();
         logger.info("decode the frame size :" + size);
-        //start to decode
+        // start to decode
         final IBuffer iBuffer = IBuffer.make(null, size);
         final IPacket iPacket = IPacket.make(iBuffer);
-        iPacket.getByteBuffer().put(frameBuffer.toByteBuffer());
-        //decode the packet
+        iPacket.getByteBuffer().put(buffer.toByteBuffer());
+        // decode the packet
         if (!iPacket.isComplete()) {
-            return;
+            return null;
         }
 
         final IVideoPicture picture = IVideoPicture.make(IPixelFormat.Type.YUV420P, dimension.width, dimension.height);
@@ -128,18 +121,20 @@ public class Decoder extends ObjectDecoder {
                 if (picture.isComplete()) {
                     final IConverter converter = ConverterFactory.createConverter(type.getDescriptor(), picture);
                     final BufferedImage image = converter.toImage(picture);
-                    //BufferedImage convertedImage = ImageUtils.convertToType(image, BufferedImage.TYPE_3BYTE_BGR);
-                    //here ,put out the image
+                    // BufferedImage convertedImage =
+                    // ImageUtils.convertToType(image,
+                    // BufferedImage.TYPE_3BYTE_BGR);
+                    // here ,put out the image
                     if (streamFrameListener != null) {
-                        streamFrameListener.onFrameReceived(clientId, image);
+                        streamFrameListener.onFrameReceived(null, image);
                     }
                     converter.delete();
                 } else {
                     picture.delete();
                     iPacket.delete();
-                    return;
+                    return null;
                 }
-                //clean the picture and reuse it
+                // clean the picture and reuse it
                 picture.getByteBuffer().clear();
             }
         } finally {
@@ -149,6 +144,8 @@ public class Decoder extends ObjectDecoder {
             iPacket.delete();
             // ByteBufferUtil.destroy(data);
         }
+
+        return null;
 
     }
 

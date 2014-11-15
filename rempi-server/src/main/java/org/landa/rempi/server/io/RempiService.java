@@ -1,5 +1,7 @@
 package org.landa.rempi.server.io;
 
+import io.pallas.core.annotations.Component;
+import io.pallas.core.annotations.Configured;
 import io.pallas.core.annotations.Startup;
 
 import java.util.concurrent.Executor;
@@ -17,6 +19,7 @@ import org.apache.log4j.Logger;
  */
 @Startup
 @ApplicationScoped
+@Component("rempiServer")
 public class RempiService {
 
     private RempiServer rempiServer;
@@ -30,16 +33,18 @@ public class RempiService {
     @Inject
     private RempiServerHandler handler;
 
+    @Inject
+    @Configured(defaultValue = "9000")
+    private Integer port;
+
     @PostConstruct
     private void startService() {
-
-        final int port = 9000;
 
         rempiServer = new RempiServer(port, executor, handler);
 
         rempiServer.run();
 
-        logger.info("Rempi server started as port: " + port);
+        logger.info("Rempi server started at port: " + port);
     }
 
     @PreDestroy

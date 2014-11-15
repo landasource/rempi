@@ -13,31 +13,32 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.landa.rempi.server.io.ssh;
+package org.landa.rempi.client.pipeline;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
 import javax.net.ssl.SSLEngine;
 
+import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.ChannelUpstreamHandler;
-import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
+import org.jboss.netty.handler.codec.serialization.ClassResolvers;
+import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 import org.jboss.netty.handler.ssl.SslHandler;
+import org.landa.rempi.comm.Command;
 import org.landa.rempi.comm.ssh.SecureSslContextFactory;
 
 /**
  * Creates a newly configured {@link ChannelPipeline} for a new channel.
  */
-public class SecureServerPipelineFactory implements ChannelPipelineFactory {
+public class SecureClientPipelineFactory implements ChannelPipelineFactory {
 
-    private final ChannelUpstreamHandler handler;
+    private final ChannelHandler[] upstreamHandlers;
 
-    private final ChannelUpstreamHandler[] decoders;
+    public SecureClientPipelineFactory(final ChannelHandler... upstreamHandlers) {
 
-    public SecureServerPipelineFactory(final ChannelUpstreamHandler handler, final ChannelUpstreamHandler... decoders) {
-        this.handler = handler;
-        this.decoders = decoders;
+        this.upstreamHandlers = upstreamHandlers;
+
     }
 
     @Override
@@ -49,26 +50,21 @@ public class SecureServerPipelineFactory implements ChannelPipelineFactory {
         // and accept any invalid certificates in the client side.
         // You will need something more complicated to identify both
         // and server in the real world.
-        //
-        // Read SecureSslContextFactory
-        // if you need client certificate authentication.
 
-        final SSLEngine engine = SecureSslContextFactory.getServerContext().createSSLEngine();
-        engine.setUseClientMode(false);
+        final SSLEngine engine = SecureSslContextFactory.getClientContext().createSSLEngine();
+        engine.setUseClientMode(true);
 
         pipeline.addLast("ssl", new SslHandler(engine));
 
         // On top of the SSL handler, add the text line codec.
         // pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192,
         // Delimiters.lineDelimiter()));
-        int i = 0;
-        for (final ChannelUpstreamHandler handler : decoders) {
-            pipeline.addLast("decoder-" + i++, handler);
-        }
-        pipeline.addLast("encoder", new ObjectEncoder());
+        pipeline.addLast("decoder", new ObjectDecoder(ClassResolvers.softCachingResolver(Command.class.getClassLoader())));
 
-        // and then business logic.
-        pipeline.addLast("handler", handler);
+        int i = 0;
+        for (final ChannelHandler clientHandler : upstreamHandlers) {
+            pipeline.addLast("handler-" + i++, clientHandler);
+        }
 
         return pipeline;
     }

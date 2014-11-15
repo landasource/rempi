@@ -10,6 +10,9 @@ require.config({
         'angular-websocket' : {
             deps : [ 'angular' ]
         },
+        'semantic' : {
+            deps : [ 'jquery' ]
+        },
         'angular' : {
             exports : 'angular'
         },

@@ -7,7 +7,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<webcam.version>0.3.10-RC7</webcam.version>
+		<webcam.version>0.3.10</webcam.version>
 	</properties>
 
 	<dependencies>
