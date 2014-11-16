@@ -10,12 +10,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.handler.ssl.SslHandler;
 import org.landa.rempi.client.executors.Executor;
 import org.landa.rempi.comm.livestream.StartStreamCommand;
 import org.landa.rempi.comm.livestream.StopStreamCommand;
@@ -96,28 +93,30 @@ public class LiveStreamHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void channelConnected(final ChannelHandlerContext ctx, final ChannelStateEvent e) throws Exception {
 
-        // Get the SslHandler from the pipeline
-        // which were added in SecureChatPipelineFactory.
-        final SslHandler sslHandler = ctx.getPipeline().get(SslHandler.class);
-        // Begin handshake.
-        final ChannelFuture channelFuture = sslHandler.handshake();
+        //        // Get the SslHandler from the pipeline
+        //        // which were added in SecureChatPipelineFactory.
+        //        final SslHandler sslHandler = ctx.getPipeline().get(SslHandler.class);
+        //        // Begin handshake.
+        //        final ChannelFuture channelFuture = sslHandler.handshake();
+        //
+        //        channelFuture.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+        //        channelFuture.addListener(new ChannelFutureListener() {
+        //            @Override
+        //            public void operationComplete(final ChannelFuture future) throws Exception {
+        //                // if (future.isSuccess()) {
+        //                // Commandor.addExecutor(ServerGreeting.class, new
+        //                // Authenticator(RempiClient.getID()));
+        //                // }
+        //                if (future.isSuccess()) {
+        //                    streamToChannel(future.getChannel());
+        //                } else {
+        //                    stopStream();
+        //                }
+        //
+        //            }
+        //        });
 
-        channelFuture.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-        channelFuture.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(final ChannelFuture future) throws Exception {
-                // if (future.isSuccess()) {
-                // Commandor.addExecutor(ServerGreeting.class, new
-                // Authenticator(RempiClient.getID()));
-                // }
-                if (future.isSuccess()) {
-                    streamToChannel(future.getChannel());
-                } else {
-                    stopStream();
-                }
-
-            }
-        });
+        streamToChannel(e.getChannel());
     }
 
     private void streamToChannel(final Channel channel) {

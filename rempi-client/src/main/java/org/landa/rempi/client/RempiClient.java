@@ -36,7 +36,7 @@ public class RempiClient {
         // Configure the client.
         final ClientBootstrap bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
 
-        bootstrap.setPipelineFactory(new SecureClientPipelineFactory(new ObjectEncoder(), new RempiClientHandler(bootstrap, timer, ID)));
+        bootstrap.setPipelineFactory(new SecureClientPipelineFactory(true, new ObjectEncoder(), new RempiClientHandler(bootstrap, timer, ID)));
 
         // Start the connection attempt.
         final InetSocketAddress serverAddress = new InetSocketAddress(HOST, port);

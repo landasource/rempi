@@ -1,4 +1,4 @@
-package org.landa.rempi.server.web.controller.client;
+package org.landa.rempi.server.web.controller.client.event;
 
 import io.pallas.core.ws.Broadcaster;
 import io.pallas.core.ws.events.OnOpen;
@@ -8,13 +8,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import org.apache.shiro.codec.Base64;
 import org.landa.rempi.server.io.event.OnClientConnected;
 import org.landa.rempi.server.io.event.OnClientDisconnected;
 import org.landa.rempi.server.io.event.OnClientError;
+import org.landa.rempi.server.io.event.OnClientImage;
 import org.landa.rempi.server.io.livestream.OnLiveStreamFrame;
-import org.landa.rempi.server.web.controller.client.event.ClientConnectedMessage;
-import org.landa.rempi.server.web.controller.client.event.ClientDisconnectedMessage;
-import org.landa.rempi.server.web.controller.client.event.ClientErrorMessage;
+import org.landa.rempi.server.web.controller.client.ClientImage;
 
 @ApplicationScoped
 public class ClientWsController {
@@ -44,6 +44,12 @@ public class ClientWsController {
 
     public void onLiveStreamImage(@Observes final OnLiveStreamFrame frame) {
         System.out.println("ClientWsController.onLiveStreamImage()");
+    }
+
+    public void onImage(@Observes final OnClientImage clientImage) {
+
+        final String image = Base64.encodeToString(clientImage.getImage());
+        broadcaster.broadcastJson(new ClientImage(clientImage.getClientId(), image));
     }
 
 }

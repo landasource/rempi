@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
-import org.landa.rempi.server.io.ssh.SecureServerPipelineFactory;
+import org.landa.rempi.server.io.pipeline.SecureServerPipelineFactory;
 
 @Startup
 @ApplicationScoped
@@ -47,7 +47,7 @@ public class LiveStreamReceiverServer {
     public void run() {
         bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(executor, executor));
 
-        bootstrap.setPipelineFactory(new SecureServerPipelineFactory(handler, new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4), decoder));
+        bootstrap.setPipelineFactory(new SecureServerPipelineFactory(false, handler, new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4), decoder));
 
         // Bind and start to accept incoming connections.
         bootstrap.bind(new InetSocketAddress(port));

@@ -18,7 +18,7 @@ class LiveStreamClient {
 
         bootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
 
-        bootstrap.setPipelineFactory(new SecureClientPipelineFactory(new LengthFieldPrepender(4, false), channelUpstreamHandler));
+        bootstrap.setPipelineFactory(new SecureClientPipelineFactory(false, new LengthFieldPrepender(4, false), channelUpstreamHandler));
 
         // Start the connection attempt.
         final InetSocketAddress serverAddress = new InetSocketAddress(RempiClient.getHost(), port);

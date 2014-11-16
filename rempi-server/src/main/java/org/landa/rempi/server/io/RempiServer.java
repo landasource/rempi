@@ -6,13 +6,14 @@ import java.util.concurrent.Executor;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.handler.codec.serialization.ClassResolver;
 import org.jboss.netty.handler.codec.serialization.ClassResolvers;
 import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 import org.landa.rempi.comm.Command;
 import org.landa.rempi.comm.SyncCommand;
 import org.landa.rempi.comm.livestream.handler.StreamFrameListener;
 import org.landa.rempi.server.io.comm.Promise;
-import org.landa.rempi.server.io.ssh.SecureServerPipelineFactory;
+import org.landa.rempi.server.io.pipeline.SecureServerPipelineFactory;
 
 /**
  * Modification of {@link EchoServer} which utilizes Java object serialization.
@@ -36,8 +37,8 @@ public class RempiServer {
     public void run() {
         bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(executor, executor));
 
-        bootstrap.setPipelineFactory(new SecureServerPipelineFactory(rempiServerHandler, new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(Command.class
-                .getClassLoader()))));
+        final ClassResolver classResolver = ClassResolvers.weakCachingConcurrentResolver(Command.class.getClassLoader());
+        bootstrap.setPipelineFactory(new SecureServerPipelineFactory(true, rempiServerHandler, new ObjectDecoder(classResolver)));
 
         // Bind and start to accept incoming connections.
         bootstrap.bind(new InetSocketAddress(port));

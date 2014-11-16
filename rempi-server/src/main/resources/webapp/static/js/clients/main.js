@@ -22,7 +22,7 @@ require.config({
     }
 });
 
-require([ 'jquery', 'angular', 'ToastCtrl', 'angular-websocket', 'semantic' ], function($, angular, ToastCtrl) {
+require([ 'jquery', 'angular', 'ToastCtrl', 'ImageCtrl' ,'angular-websocket', 'semantic' ], function($, angular, ToastCtrl, ImageCtrl) {
 
     var app = angular.module('rempi-server', [ 'angular-websocket' ]);
 
@@ -40,6 +40,7 @@ require([ 'jquery', 'angular', 'ToastCtrl', 'angular-websocket', 'semantic' ], f
     });
 
     app.controller('ToastCtrl', ToastCtrl);
+    app.controller('ImageCtrl', ImageCtrl);
 
     app.controller('ClientsCtrl', function($scope, WebSocket, $http, $rootScope) {
 
@@ -65,7 +66,7 @@ require([ 'jquery', 'angular', 'ToastCtrl', 'angular-websocket', 'semantic' ], f
         });
 
         WebSocket.onmessage(function(event) {
-            console.log("WS event happened", event);
+            //console.log("WS event happened", event);
 
             var data = JSON.parse(event.data);
             switch (data.eventType) {
@@ -80,6 +81,12 @@ require([ 'jquery', 'angular', 'ToastCtrl', 'angular-websocket', 'semantic' ], f
 
             case "error":
                 $scope.$emit('clientError', data);
+                break;
+            case "image":
+                $scope.$emit('clientImage', data);
+                break;
+            default:
+                console.log(event);
                 break;
             }
         });

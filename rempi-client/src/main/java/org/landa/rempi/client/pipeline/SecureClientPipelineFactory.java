@@ -34,9 +34,11 @@ import org.landa.rempi.comm.ssh.SecureSslContextFactory;
 public class SecureClientPipelineFactory implements ChannelPipelineFactory {
 
     private final ChannelHandler[] upstreamHandlers;
+    private final boolean useSsh;
 
-    public SecureClientPipelineFactory(final ChannelHandler... upstreamHandlers) {
+    public SecureClientPipelineFactory(final boolean useSsh, final ChannelHandler... upstreamHandlers) {
 
+        this.useSsh = useSsh;
         this.upstreamHandlers = upstreamHandlers;
 
     }
@@ -50,11 +52,12 @@ public class SecureClientPipelineFactory implements ChannelPipelineFactory {
         // and accept any invalid certificates in the client side.
         // You will need something more complicated to identify both
         // and server in the real world.
+        if (useSsh) {
+            final SSLEngine engine = SecureSslContextFactory.getClientContext().createSSLEngine();
+            engine.setUseClientMode(true);
 
-        final SSLEngine engine = SecureSslContextFactory.getClientContext().createSSLEngine();
-        engine.setUseClientMode(true);
-
-        pipeline.addLast("ssl", new SslHandler(engine));
+            pipeline.addLast("ssl", new SslHandler(engine));
+        }
 
         // On top of the SSL handler, add the text line codec.
         // pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192,

@@ -25,6 +25,7 @@ import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.handler.ssl.SslHandler;
 import org.landa.rempi.comm.Authentication;
+import org.landa.rempi.comm.CapturedImage;
 import org.landa.rempi.comm.Command;
 import org.landa.rempi.comm.ErrorMessage;
 import org.landa.rempi.comm.InfoMessage;
@@ -36,6 +37,7 @@ import org.landa.rempi.server.io.comm.WaitingPromise;
 import org.landa.rempi.server.io.event.OnClientConnected;
 import org.landa.rempi.server.io.event.OnClientDisconnected;
 import org.landa.rempi.server.io.event.OnClientError;
+import org.landa.rempi.server.io.event.OnClientImage;
 
 /**
  * Handles both client-side and server-side handler depending on which
@@ -119,18 +121,29 @@ public class RempiServerHandler extends SimpleChannelUpstreamHandler {
             final OnClientConnected connected = new OnClientConnected(clientId);
             beanManager.fireEvent(connected);
 
-        } else if (message instanceof ErrorMessage) {
-
-            final OnClientError clientError = new OnClientError(getClientIdOfChannel(channelId), (ErrorMessage) message);
-            beanManager.fireEvent(clientError);
-
-        } else if (message instanceof InfoMessage) {
-
-            logger.info("Stati info from client: " + message.toString());
-
         } else {
-            logger.info("Message from client: " + message.toString());
+            final String clientIdOfChannel = getClientIdOfChannel(channelId);
+            if (message instanceof CapturedImage) {
 
+                final CapturedImage capturedImage = (CapturedImage) message;
+
+                logger.info("Image from client: " + clientIdOfChannel);
+
+                beanManager.fireEvent(new OnClientImage(clientIdOfChannel, capturedImage.getData()));
+
+            } else if (message instanceof ErrorMessage) {
+
+                final OnClientError clientError = new OnClientError(clientIdOfChannel, (ErrorMessage) message);
+                beanManager.fireEvent(clientError);
+
+            } else if (message instanceof InfoMessage) {
+
+                logger.info("Stati info from client: " + message.toString());
+
+            } else {
+                logger.info("Message from client: " + message.toString());
+
+            }
         }
     }
 
