@@ -116,6 +116,7 @@ require([ 'jquery', 'angular', 'ToastCtrl', 'ImageCtrl' ,'angular-websocket', 's
         };
 
         $scope.stopStream = function(clientId) {
+            $scope.$emit('stopStream', clientId);
             $http.get('/client/stopStream?clientId=' + clientId);
         };
 

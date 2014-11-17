@@ -7,7 +7,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<webcam.version>0.3.10</webcam.version>
+		<webcam.version>0.3.10-RC7</webcam.version>
 	</properties>
 
 	<dependencies>
@@ -23,7 +23,19 @@
 			<artifactId>webcam-capture-driver-fswebcam</artifactId>
 			<version>${webcam.version}</version>
 		</dependency>
-		
+
+		<!-- <dependency> -->
+		<!-- <groupId>com.github.sarxos</groupId> -->
+		<!-- <artifactId>webcam-capture-driver-v4l4j</artifactId> -->
+		<!-- <version>${webcam.version}</version> -->
+		<!-- </dependency> -->
+
+		<dependency>
+			<groupId>com.github.sarxos</groupId>
+			<artifactId>webcam-capture-driver-gstreamer</artifactId>
+			<version>0.3.10-RC7</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.github.sarxos</groupId>
 			<artifactId>webcam-capture</artifactId>
@@ -35,6 +47,12 @@
 
 	<repositories>
 
+		<repository>
+			<id>maven-v4l4j-github-repo</id>
+			<name>Maven Repository on github</name>
+			<url>https://raw.githubusercontent.com/sarxos/v4l4j-wc/master/maven2</url>
+		</repository>
+	
 		<repository>
 			<id>SarXos Repository</id>
 			<url>http://www.sarxos.pl/repo/maven2</url>
@@ -111,7 +129,7 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<finalName>${project.artifactId}-${project.version}</finalName>
-					<appendAssemblyId>false</appendAssemblyId>					
+					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 			</plugin>
 		</plugins>

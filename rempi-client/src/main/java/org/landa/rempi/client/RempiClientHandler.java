@@ -134,6 +134,6 @@ public class RempiClientHandler extends SimpleChannelUpstreamHandler {
             channel.write(new ErrorMessage("Error", cause));
         }
 
-        //ctx.getChannel().close();
+        ctx.getChannel().close();
     }
 }

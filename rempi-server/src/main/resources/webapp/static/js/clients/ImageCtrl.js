@@ -10,6 +10,10 @@ define(['jquery'],function($){
             $scope.clientImage = image;
         });
         
+        $rootScope.$on('stopStream', function(evt, clientId){
+            $scope.clientImage = null;
+        });
+        
     };
     
     return ctrl;

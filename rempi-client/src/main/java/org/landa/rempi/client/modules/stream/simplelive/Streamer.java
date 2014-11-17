@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 
 import org.jboss.netty.channel.Channel;
 import org.landa.rempi.client.executors.Executor;
+import org.landa.rempi.client.modules.webcam.WebcamProvider;
 import org.landa.rempi.comm.CapturedImage;
 import org.landa.rempi.comm.livestream.StartStreamCommand;
 import org.landa.rempi.comm.livestream.StopStreamCommand;
@@ -23,11 +24,12 @@ import com.github.sarxos.webcam.Webcam;
  */
 public class Streamer {
 
+    private static final int FPS = 15;
     private static Streamer INST = null;
     private ScheduledThreadPoolExecutor timerExecutor;
     private ScheduledFuture<?> scheduledFuture;
-    private final Webcam webcam;
-    private final Dimension dimension;
+    private Webcam webcam;
+    private Dimension dimension;
 
     public static Streamer instance() {
         if (null == INST) {
@@ -37,26 +39,35 @@ public class Streamer {
     }
 
     static {
+        //  Webcam.setDriver(new FsWebcamDriver());
         Webcam.setAutoOpenMode(false);
-
         Webcam.getDiscoveryService().stop();
     }
 
     private Streamer() {
-        Webcam.getDiscoveryService().scan();
-        this.webcam = Webcam.getDefault();
-        this.dimension = new Dimension(320, 240);
-        webcam.setViewSize(dimension);
-        this.webcam.open();
+
+        startWebcam();
+    }
+
+    private void startWebcam() {
+        if (null == webcam) {
+            Webcam.getDiscoveryService().scan();
+            this.webcam = WebcamProvider.getWebcam();
+        }
+        if (null != webcam && !webcam.isOpen()) {
+            this.dimension = new Dimension(320, 240);
+            webcam.setViewSize(dimension);
+            this.webcam.open();
+        }
     }
 
     private void start(final Channel channel) {
 
         if (null == timerExecutor) { // if not runs
-
+            startWebcam();
             timerExecutor = new ScheduledThreadPoolExecutor(1);
             final Runnable grabCommand = new ImageGrabber(channel);
-            scheduledFuture = timerExecutor.scheduleAtFixedRate(grabCommand, 0, 1000 / 25, TimeUnit.MILLISECONDS);
+            scheduledFuture = timerExecutor.scheduleAtFixedRate(grabCommand, 0, 1000 / FPS, TimeUnit.MILLISECONDS);
         }
 
     }
